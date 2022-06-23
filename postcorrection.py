@@ -1,3 +1,5 @@
+from numpy import argmax
+import re
 import torch
 from transformers import pipeline
 
@@ -8,6 +10,32 @@ class PostCorrection():
         self.tokenizer = self.pipeline.tokenizer
         self.doc = None
         self.predictions = []
+
+    def metric(self, word, pred):
+        score = 0
+
+        for i in word:
+            if re.search(i, pred):
+                score = score + 1
+        
+        return score
+
+    def best_match(self, word, predictions):
+        similarity_score = []
+        
+        for pred in predictions:
+            similarity_score.append(self.metric(word, pred))
+        
+        return predictions[argmax(similarity_score)]
+
+    def final_text(self, words, indices, predictions):
+        for i, idx in enumerate(indices):
+            word = words[idx]
+            pred = predictions[i]
+            match = self.best_match(word, pred)
+            words[idx] = match
+        
+        return ' '.join(words)
 
     def apply_correction(self, k, doc):
         self.doc = doc

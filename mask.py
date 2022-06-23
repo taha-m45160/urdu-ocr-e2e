@@ -9,15 +9,13 @@ class MaskingEngine():
         words = doc.split(' ')
         masked = []
         indices = []
-        for idx, word in enumerate(words):
+        for idx, word in enumerate(words):            
             if word in self.urd_dict:
                 masked.append(word)
             else:
                 indices.append(idx)
                 masked.append('<mask>')
+
         masked_doc = ' '.join(masked)
 
-        return words, masked_doc, indices, masked
-
-# if __name__ == '__main__':
-#     ocr_pipeline = MaskingEngine()
+        return words, masked_doc, indices

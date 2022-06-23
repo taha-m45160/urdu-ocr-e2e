@@ -3,24 +3,23 @@ import tesseract
 import mask
 import postcorrection
 import os
+import sys
 
 class Pipeline:
     def __init__(self) -> None:
         self.image = None
         self.doc = ""
-        self.ocr_engine = tesseract.OCR()
+        self.ocr_engine = tesseract.OCR('UrduNastaleeq')
         self.masking_engine = mask.MaskingEngine()
         self.post_corr = postcorrection.PostCorrection()
 
-    def get_ocr_output(self):
+    def get_ocr_output(self, image_path):
         """
         retrieve output from OCR engine
         """
-        # with open('sample_gt/1.txt') as gt:
-        #     self.doc = gt.read().replace('\n', '')[:-1]
 
-        line = input('Enter line: ')
-        self.doc = line
+        # self.doc = input('Enter line: ')
+        self.doc = self.ocr_engine.detect_text(image_path)
 
         return self.doc
 
@@ -47,33 +46,32 @@ class Pipeline:
 if __name__ == '__main__':
     ocr_pipeline = Pipeline()
 
-    # ocr_pipeline.get_ocr_output()
-    # with open('sample_gt/1_masked.txt') as gt:
-    #     doc = gt.read()
-
-    # masked_doc = ocr_pipeline.mask_document()
-
-    # corrected_doc = ocr_pipeline.correct_document(doc)
-
-    # print(corrected_doc)
-
     run = True
     while run:
         os.system('clear')
+
+        try:
+            image_path = sys.argv[1]
+        except:
+            print('Image path not found.')
+            sys.exit()
         
-        ocr_pipeline.get_ocr_output()
+        tess_output = ocr_pipeline.get_ocr_output(image_path)
+        print(tess_output)
+
+        print('\n\n')
+
         k = input('Enter k: ')
-        words, masked_doc, indices, masked = ocr_pipeline.mask_document()
+        words, masked_doc, indices = ocr_pipeline.mask_document()
+
         print('\n\n')
-        print('Masked: ', masked_doc)
-        print(masked)
-        print(words)
-        print('\n\n')
-        corrected_line = ocr_pipeline.correct_document(int(k), masked_doc)
-        for cl in corrected_line:
-            print(cl)
+        predictions = ocr_pipeline.correct_document(int(k), masked_doc)
+        
+        final_text = ocr_pipeline.post_corr.final_text(words, indices, predictions)
+
+        print(final_text)
+
         choice = input('\n')
+
         if choice == exit:
             run = False
-
-    
