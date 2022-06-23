@@ -9,7 +9,7 @@ class PostCorrection():
         self.doc = None
         self.predictions = []
 
-    def apply_correction(self, doc):
+    def apply_correction(self, k, doc):
         self.doc = doc
 
         inputs = self.tokenizer(self.doc, return_tensors="pt")
@@ -20,8 +20,9 @@ class PostCorrection():
         mask_token_index = (inputs.input_ids == self.tokenizer.mask_token_id)[0].nonzero(as_tuple=True)[0]
 
         # get indices of top k max probability tokens
-        top_k_tokens = logits[0, mask_token_index].topk(k=10, dim=1).indices
-
+        top_k_tokens = logits[0, mask_token_index].topk(k=k, dim=1).indices
+        
+        self.predictions = []
         # record predictions for each mask
         for i in top_k_tokens:
             self.predictions.append(self.tokenizer.decode(i))
