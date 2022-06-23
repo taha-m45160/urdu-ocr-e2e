@@ -8,12 +8,14 @@ class Pipeline:
         self.ocr_engine = tesseract.OCR()
         self.masking_engine = mask.MaskingEngine()
 
-
     def get_ocr_output(self):
         """
         retrieve output from OCR engine
         """
-        pass
+        with open('sample_gt/1.txt') as gt:
+            self.doc = gt.read().replace('\n', '')[:-1]
+
+        return self.doc
 
     def split_document(self):
         """
@@ -22,7 +24,7 @@ class Pipeline:
         input: ocr output document
         return: array of sentences in the original document 
         """
-        return self.doc.split('.')
+        return self.doc.split('۔')
 
     def maskDocument():
         """
@@ -70,4 +72,8 @@ potentialDrawbacks = """
 if __name__ == '__main__':
     ocr_pipeline = Pipeline()
 
-    print(ocr_pipeline.split_document())
+    ocr_pipeline.get_ocr_output()
+
+    split_doc = ocr_pipeline.split_document()
+
+    print(split_doc)
