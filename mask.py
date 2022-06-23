@@ -5,5 +5,5 @@ class MaskingEngine():
     def mask(self, doc):
         return "masked"
 
-if __name__ == '__main__':
-    ocr_pipeline = MaskingEngine()
+# if __name__ == '__main__':
+#     ocr_pipeline = MaskingEngine()
