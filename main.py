@@ -1,5 +1,6 @@
-import mask
 import tesseract
+import mask
+import postcorrection
 
 class Pipeline:
     def __init__(self) -> None:
@@ -7,6 +8,7 @@ class Pipeline:
         self.doc = "My name is Taha. I am part of the CSaLT fam. We are making an OCR"
         self.ocr_engine = tesseract.OCR()
         self.masking_engine = mask.MaskingEngine()
+        self.post_corr = postcorrection.PostCorrection()
 
     def get_ocr_output(self):
         """
@@ -17,26 +19,17 @@ class Pipeline:
 
         return self.doc
 
-    def split_document(self):
-        """
-        split ocr output into sentences/(phrases?)
-
-        input: ocr output document
-        return: array of sentences in the original document 
-        """
-        return self.doc.split('۔')
-
-    def maskDocument():
+    def mask_document(self):
         """
         mask each sentence as appropriate
         """
-        pass
+        return self.masking_engine.mask(self.doc)
 
-    def correctDocument():
+    def correct_document(self, doc):
         """
         correct the masked ocr output
         """
-        pass
+        return self.post_corr.apply_correction(doc)
 
     def joinDocument():
         """
@@ -74,6 +67,11 @@ if __name__ == '__main__':
 
     ocr_pipeline.get_ocr_output()
 
-    split_doc = ocr_pipeline.split_document()
+    # masked_doc = ocr_pipeline.mask_document()
 
-    print(split_doc)
+    with open('sample_gt/1_masked.txt') as gt:
+        doc = gt.read()
+
+    corrected_doc = ocr_pipeline.correct_document(doc)
+
+    print(corrected_doc)
