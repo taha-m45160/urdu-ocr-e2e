@@ -1,8 +1,9 @@
-from numpy import argmax
+from numpy import argmin
 import re
 import torch
 from transformers import pipeline
-
+import enchant
+  
 class PostCorrection():
     def __init__(self) -> None:
         self.pipeline = pipeline("fill-mask", model="urduhack/roberta-urdu-small", tokenizer="urduhack/roberta-urdu-small")
@@ -12,13 +13,7 @@ class PostCorrection():
         self.predictions = []
 
     def metric(self, word, pred):
-        score = 0
-
-        for i in word:
-            if re.search(i, pred):
-                score = score + 1
-        
-        return score
+        return enchant.utils.levenshtein(word, pred)
 
     def best_match(self, word, predictions):
         similarity_score = []
@@ -26,7 +21,7 @@ class PostCorrection():
         for pred in predictions:
             similarity_score.append(self.metric(word, pred))
         
-        return predictions[argmax(similarity_score)]
+        return predictions[argmin(similarity_score)]
 
     def final_text(self, words, indices, predictions):
         for i, idx in enumerate(indices):

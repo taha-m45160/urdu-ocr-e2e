@@ -18,7 +18,6 @@ class Pipeline:
         retrieve output from OCR engine
         """
 
-        # self.doc = input('Enter line: ')
         self.doc = self.ocr_engine.detect_text(image_path)
 
         return self.doc
@@ -49,29 +48,35 @@ if __name__ == '__main__':
     run = True
     while run:
         os.system('clear')
+        file = open('output.txt', 'w')
 
-        try:
-            image_path = sys.argv[1]
-        except:
-            print('Image path not found.')
-            sys.exit()
+        image_path = input('Enter image path: ')
+        print('\n\n')
         
         tess_output = ocr_pipeline.get_ocr_output(image_path)
-        print(tess_output)
-
-        print('\n\n')
+        file.write('Tesseract output: \n')
+        file.write(tess_output)
+        file.write('\n\n')
 
         k = input('Enter k: ')
-        words, masked_doc, indices = ocr_pipeline.mask_document()
-
         print('\n\n')
+
+        words, masked_doc, indices = ocr_pipeline.mask_document()
+        print(" ".join(words))
+        file.write('Google spell checked: \n')
+        file.write(' '.join(words))
+        file.write('\n\n')
+
+        file.write('Masked output: \n')
+        file.write(masked_doc)
+        file.write('\n\n')
+
         predictions = ocr_pipeline.correct_document(int(k), masked_doc)
-        
         final_text = ocr_pipeline.post_corr.final_text(words, indices, predictions)
+        file.write('After Bert: \n')
+        file.write(final_text)
+        file.close()
 
-        print(final_text)
-
-        choice = input('\n')
-
+        choice = input('Enter to continue...')
         if choice == exit:
             run = False
